@@ -16,6 +16,9 @@ public class AeronavePassageirosOutputStream extends OutputStream {
                                            int quantidade,
                                            int bytesPorAtributo,
                                            OutputStream destino) {
+        if (bytesPorAtributo < 1 || bytesPorAtributo > 4) {
+            throw new IllegalArgumentException("bytesPorAtributo deve estar entre 1 e 4");
+        }
         this.objetos = objetos;
         this.quantidade = quantidade;
         this.bytesPorAtributo = bytesPorAtributo;
@@ -28,12 +31,15 @@ public class AeronavePassageirosOutputStream extends OutputStream {
     }
 
     public void writeAll() throws IOException {
+        // Header para que o InputStream saiba como reconstruir os inteiros.
+        saida.writeByte(bytesPorAtributo);
+
         for (int i = 0; i < quantidade && i < objetos.length; i++) {
             AeronavePassageiros ap = objetos[i];
 
-            saida.writeInt(ap.getId());
-            saida.writeInt(ap.getNumAssentos());
-            saida.writeInt(ap.getTripulacaoMinima());
+            writeIntByConfiguredSize(ap.getId());
+            writeIntByConfiguredSize(ap.getNumAssentos());
+            writeIntByConfiguredSize(ap.getTripulacaoMinima());
 
             byte[] prefixoBytes = ap.getPrefixo().getBytes("UTF-8");
             saida.writeShort(prefixoBytes.length);
@@ -42,6 +48,12 @@ public class AeronavePassageirosOutputStream extends OutputStream {
             saida.writeByte(ap.isAutomatico() ? 1 : 0);
         }
         saida.flush();
+    }
+
+    private void writeIntByConfiguredSize(int valor) throws IOException {
+        for (int shift = (bytesPorAtributo - 1) * 8; shift >= 0; shift -= 8) {
+            saida.writeByte((valor >> shift) & 0xFF);
+        }
     }
 
     @Override

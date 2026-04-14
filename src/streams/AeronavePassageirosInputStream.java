@@ -5,15 +5,18 @@ import model.AeronavePassageiros;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AeronavePassageirosInputStream extends InputStream {
 
+    private final PushbackInputStream origemComRetorno;
     private final DataInputStream entrada;
 
     public AeronavePassageirosInputStream(InputStream origem) {
-        this.entrada = new DataInputStream(origem);
+        this.origemComRetorno = new PushbackInputStream(origem, 1);
+        this.entrada = new DataInputStream(origemComRetorno);
     }
 
     @Override
@@ -23,12 +26,21 @@ public class AeronavePassageirosInputStream extends InputStream {
 
     public List<AeronavePassageiros> readAll() throws IOException {
         List<AeronavePassageiros> lista = new ArrayList<>();
+        int bytesPorAtributo;
 
         try {
-            while (entrada.available() > 0) {
-                int id = entrada.readInt();
-                int numAssentos = entrada.readInt();
-                int tripulacaoMinima = entrada.readInt();
+            int possivelCabecalho = entrada.readUnsignedByte();
+            if (possivelCabecalho >= 1 && possivelCabecalho <= 4) {
+                bytesPorAtributo = possivelCabecalho;
+            } else {
+                bytesPorAtributo = 4;
+                origemComRetorno.unread(possivelCabecalho);
+            }
+
+            while (true) {
+                int id = readIntByConfiguredSize(bytesPorAtributo);
+                int numAssentos = readIntByConfiguredSize(bytesPorAtributo);
+                int tripulacaoMinima = readIntByConfiguredSize(bytesPorAtributo);
                 short lenPrefixo = entrada.readShort();
                 byte[] prefixoBytes = new byte[lenPrefixo];
                 entrada.readFully(prefixoBytes);
@@ -47,6 +59,14 @@ public class AeronavePassageirosInputStream extends InputStream {
         }
 
         return lista;
+    }
+
+    private int readIntByConfiguredSize(int bytesPorAtributo) throws IOException {
+        int valor = 0;
+        for (int i = 0; i < bytesPorAtributo; i++) {
+            valor = (valor << 8) | entrada.readUnsignedByte();
+        }
+        return valor;
     }
 
     @Override

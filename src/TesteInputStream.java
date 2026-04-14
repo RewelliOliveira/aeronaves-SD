@@ -8,6 +8,44 @@ import java.util.List;
 
 public class TesteInputStream {
 
+    // TESTE A — entrada padrão (System.in)
+    static void testeA() throws IOException {
+        System.out.println("\n=== TESTE A — System.in ===");
+
+        AeronavePassageiros ap1 = new AeronavePassageiros(
+                1, "A320", "Airbus", "PT-MHG", 6150.0, 2015,
+                150, List.of("Econômica", "Executiva"), 6
+        );
+        AeronavePassageiros ap2 = new AeronavePassageiros(
+                2, "B737-800", "Boeing", "PR-GXJ", 5765.0, 2018,
+                189, List.of("Econômica"), 5
+        );
+        ap1.ativarPilotoAutomatico();
+
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        AeronavePassageirosOutputStream out = new AeronavePassageirosOutputStream(
+                new AeronavePassageiros[]{ap1, ap2}, 2, 4, buffer
+        );
+        out.writeAll();
+        out.close();
+
+        InputStream originalIn = System.in;
+        try {
+            System.setIn(new ByteArrayInputStream(buffer.toByteArray()));
+            AeronavePassageirosInputStream in =
+                    new AeronavePassageirosInputStream(System.in);
+            List<AeronavePassageiros> lista = in.readAll();
+            in.close();
+
+            System.out.println("Objetos lidos da entrada padrão: " + lista.size());
+            for (AeronavePassageiros ap : lista) {
+                System.out.println("  -> " + ap);
+            }
+        } finally {
+            System.setIn(originalIn);
+        }
+    }
+
     // TESTE B
     static void testeB() throws IOException {
         System.out.println("\n=== TESTE B — FileInputStream ===");
@@ -85,6 +123,7 @@ public class TesteInputStream {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
+        testeA();
         testeB();
         testeC();
     }
