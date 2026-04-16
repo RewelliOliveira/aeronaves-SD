@@ -1,6 +1,7 @@
 package streams;
 
 import model.AeronavePassageiros;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,19 +10,13 @@ public class AeronavePassageirosOutputStream extends OutputStream {
 
     private final AeronavePassageiros[] objetos;
     private final int quantidade;
-    private final int bytesPorAtributo;
     private final DataOutputStream saida;
 
     public AeronavePassageirosOutputStream(AeronavePassageiros[] objetos,
                                            int quantidade,
-                                           int bytesPorAtributo,
                                            OutputStream destino) {
-        if (bytesPorAtributo < 1 || bytesPorAtributo > 4) {
-            throw new IllegalArgumentException("bytesPorAtributo deve estar entre 1 e 4");
-        }
         this.objetos = objetos;
         this.quantidade = quantidade;
-        this.bytesPorAtributo = bytesPorAtributo;
         this.saida = new DataOutputStream(destino);
     }
 
@@ -31,29 +26,29 @@ public class AeronavePassageirosOutputStream extends OutputStream {
     }
 
     public void writeAll() throws IOException {
-        // Header para que o InputStream saiba como reconstruir os inteiros.
-        saida.writeByte(bytesPorAtributo);
+        int total = Math.min(quantidade, objetos.length);
+        saida.writeInt(total);
 
-        for (int i = 0; i < quantidade && i < objetos.length; i++) {
+        for (int i = 0; i < total; i++) {
             AeronavePassageiros ap = objetos[i];
+            saida.writeInt(ap.getId());
+            saida.writeUTF(ap.getModelo());
+            saida.writeUTF(ap.getFabricante());
+            saida.writeUTF(ap.getPrefixo());
+            saida.writeDouble(ap.getAutonomiaKm());
+            saida.writeInt(ap.getAnoFabricacao());
+            saida.writeInt(ap.getNumAssentos());
+            saida.writeInt(ap.getClassesDisponiveis().size());
 
-            writeIntByConfiguredSize(ap.getId());
-            writeIntByConfiguredSize(ap.getNumAssentos());
-            writeIntByConfiguredSize(ap.getTripulacaoMinima());
+            for (String classe : ap.getClassesDisponiveis()) {
+                saida.writeUTF(classe);
+            }
 
-            byte[] prefixoBytes = ap.getPrefixo().getBytes("UTF-8");
-            saida.writeShort(prefixoBytes.length);
-            saida.write(prefixoBytes);
-
-            saida.writeByte(ap.isAutomatico() ? 1 : 0);
+            saida.writeInt(ap.getTripulacaoMinima());
+            saida.writeBoolean(ap.isAutomatico());
         }
+
         saida.flush();
-    }
-
-    private void writeIntByConfiguredSize(int valor) throws IOException {
-        for (int shift = (bytesPorAtributo - 1) * 8; shift >= 0; shift -= 8) {
-            saida.writeByte((valor >> shift) & 0xFF);
-        }
     }
 
     @Override

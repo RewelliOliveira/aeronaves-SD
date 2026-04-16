@@ -24,7 +24,7 @@ public class TesteInputStream {
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         AeronavePassageirosOutputStream out = new AeronavePassageirosOutputStream(
-                new AeronavePassageiros[]{ap1, ap2}, 2, 4, buffer
+                new AeronavePassageiros[]{ap1, ap2}, 2, buffer
         );
         out.writeAll();
         out.close();
@@ -87,7 +87,7 @@ public class TesteInputStream {
                 AeronavePassageiros[] aeronaves = {ap1, ap2};
                 AeronavePassageirosOutputStream out =
                         new AeronavePassageirosOutputStream(
-                                aeronaves, 2, 4, conn.getOutputStream()
+                                aeronaves, 2, conn.getOutputStream()
                         );
                 out.writeAll();
                 out.close();

@@ -30,7 +30,7 @@ public class TesteOutputStream {
             }
         };
         AeronavePassageirosOutputStream stream =
-                new AeronavePassageirosOutputStream(aeronaves, 2, 4, wrapper);
+                new AeronavePassageirosOutputStream(aeronaves, 2, wrapper);
         stream.writeAll();
         stream.close();
         System.out.println("\n(bytes acima sao a serializacao binaria)");
@@ -42,7 +42,7 @@ public class TesteOutputStream {
         AeronavePassageiros[] aeronaves = criarAeronaves();
         FileOutputStream fos = new FileOutputStream("aeronaves.bin");
         AeronavePassageirosOutputStream stream =
-                new AeronavePassageirosOutputStream(aeronaves, 2, 4, fos);
+                new AeronavePassageirosOutputStream(aeronaves, 2, fos);
         stream.writeAll();
         stream.close();
         System.out.println("Arquivo 'aeronaves.bin' criado com sucesso!");
@@ -74,7 +74,7 @@ public class TesteOutputStream {
             System.out.println("[CLIENTE] Conectado ao servidor!");
             AeronavePassageiros[] aeronaves = criarAeronaves();
             AeronavePassageirosOutputStream stream =
-                    new AeronavePassageirosOutputStream(aeronaves, 2, 4,
+                    new AeronavePassageirosOutputStream(aeronaves, 2,
                             socket.getOutputStream());
             stream.writeAll();
             stream.close();
