@@ -21,9 +21,11 @@ public class CompanhiaAerea {
         this.frota = new ArrayList<>();
     }
 
+
     public int getId() { return id; }
     public String getNome() { return nome; }
     public String getCodigoIATA() { return codigoIATA; }
+    public String getIata() { return codigoIATA; }
     public String getPais() { return pais; }
     public int getAnoFundacao() { return anoFundacao; }
     public List<Aeronave> getFrota() { return frota; }
