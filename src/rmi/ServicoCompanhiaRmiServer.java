@@ -12,9 +12,6 @@ public class ServicoCompanhiaRmiServer {
     public static void main(String[] args) {
         RMIServer middleware = new RMIServer(7000);
         ServicoCompanhia servico = new ServicoCompanhia();
-
-        System.out.println("[RMI Server] Pronto para receber chamadas remotas.");
-
         while (true) {
             try {
                 byte[] requestData = middleware.getRequest();
@@ -23,6 +20,9 @@ public class ServicoCompanhiaRmiServer {
                 }
 
                 MensagemRMI request = MensagemRMI.fromBytes(requestData);
+                System.out.println("\n[RMI Server] Request recebido: id=" + request.getRequestId()
+                    + ", objeto=" + request.getObjectReference()
+                    + ", metodo=" + request.getMethodId());
                 String responseJson = processarRequisicao(request, servico);
 
                 MensagemRMI reply = new MensagemRMI(
@@ -38,6 +38,9 @@ public class ServicoCompanhiaRmiServer {
                         middleware.getLastClientHost(),
                         middleware.getLastClientPort()
                 );
+                System.out.println("[RMI Server] Reply enviado para "
+                        + middleware.getLastClientHost().getHostAddress() + ":"
+                        + middleware.getLastClientPort());
             } catch (Exception e) {
                 System.err.println("[RMI Server] Erro ao processar requisicao: " + e.getMessage());
                 e.printStackTrace();
