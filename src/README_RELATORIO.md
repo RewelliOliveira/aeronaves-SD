@@ -116,14 +116,6 @@ java -cp . Main rmi-demo
 - Serializacao de dados em JSON
 - Execucao completa em modo texto, sem interface grafica
 
-## 9. Entrega no Moodle
-
-A entrega deve conter:
-
-1. URL do repositorio do codigo fonte
-2. Este relatorio em PDF (ou no formato exigido pela disciplina)
-3. Upload no Moodle dentro do prazo da atividade
-
-## 10. Observacoes Finais
+## 9. Observacoes Finais
 
 O projeto foi desenvolvido para demonstrar os conceitos de invocacao remota, separacao entre cliente e servidor, e serializacao de objetos em sistemas distribuidos, mantendo a operacao em linha de comando conforme permitido no enunciado.
